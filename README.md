@@ -1,6 +1,8 @@
 
 # MoviiGen 1.1
 
+
+
 [**MoviiGen 1.1: Towards Cinematic-Quality Video Generative Models**]("https://huggingface.co/ZuluVision/MoviiGen1.1") <be>
 
 In this repository, we present **MoviiGen 1.1**, a cutting-edge video generation model that excels in cinematic aesthetics and visual quality. This model is a fine-tuning model based on the Wan2.1. Based on comprehensive evaluations by 11 professional filmmakers and AIGC creators, including industry experts, across 60 aesthetic dimensions, **MoviiGen 1.1** demonstrates superior performance in key cinematic aspects:

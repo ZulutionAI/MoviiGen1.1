@@ -1,13 +1,6 @@
 #!/bin/bash 
  
-# PROJECT_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
-
 export PYTHONPATH=./:${PYTHONPATH}
-
-
-# --master_weight_type bf16\
-#--data_json_path data/moviidb_v0.1/preprocess/720p/videos2caption.json \
-#--data_json_path /vepfs-zulution/zhangpengpeng/cv/video_generation/Wan2.1/data/mixkit/processed/videos2caption.json \
 
 NCCL_DEBUG=ERROR CUDA_VISIBLE_DEVICES=0,1,2,3 torchrun --nnodes 1 --nproc_per_node 4 --master-port 29500 scripts/train/finetune.py \
     --max_seq_len 75600 \
