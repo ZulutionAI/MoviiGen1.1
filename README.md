@@ -1,17 +1,7 @@
----
-license: apache-2.0
-language:
-- en
-- zh
-pipeline_tag: text-to-video
-tags:
-- video generation
-library_name: diffusers
----
-# MoviiGen 1.1
------
 
-[**MoviiGen 1.1: Towards Cinematic-Quality Video Generative Models**]("") <be>
+# MoviiGen 1.1
+
+[**MoviiGen 1.1: Towards Cinematic-Quality Video Generative Models**]("https://huggingface.co/ZuluVision/MoviiGen1.1") <be>
 
 In this repository, we present **MoviiGen 1.1**, a cutting-edge video generation model that excels in cinematic aesthetics and visual quality. This model is a fine-tuning model based on the Wan2.1. Based on comprehensive evaluations by 11 professional filmmakers and AIGC creators, including industry experts, across 60 aesthetic dimensions, **MoviiGen 1.1** demonstrates superior performance in key cinematic aspects:
 
@@ -22,7 +12,6 @@ In this repository, we present **MoviiGen 1.1**, a cutting-edge video generation
 - 👍 **Professional-Grade Results**: **MoviiGen 1.1** is particularly well-suited for applications where cinematic quality, visual coherence, and aesthetic excellence are paramount, offering superior overall quality compared to other models.
 
 This repository features our latest model, which establishes new benchmarks in cinematic video generation. Through extensive evaluation by industry professionals, it has demonstrated exceptional capabilities in creating high-quality visuals with natural motion dynamics and consistent aesthetic quality, making it an ideal choice for professional video production and creative applications.
-
 
 ## Video Demos
 
