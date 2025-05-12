@@ -3,7 +3,13 @@
 export PYTHONPATH=./:${PYTHONPATH}
 OUTPUT_DIR=YOUR_OUTPUT_DIR
 DATA_JSON_PATH=YOUR_DATA_JSON_PATH
-torchrun --nnodes 1 --nproc_per_node 8 --master-port 29500 scripts/train/finetune.py \
+torchrun \
+    --nnodes $MLP_WORKER_NUM \
+    --node_rank $MLP_ROLE_INDEX \
+    --nproc_per_node $MLP_WORKER_GPU \
+    --master_addr $MLP_WORKER_0_HOST \
+    --master_port $MLP_WORKER_0_PORT \
+    scripts/train/finetune.py \
     --max_seq_len 75600 \
     --master_weight_type bf16 \
     --ckpt_dir ZulutionAI/MoviiGen1.1 \
@@ -11,7 +17,7 @@ torchrun --nnodes 1 --nproc_per_node 8 --master-port 29500 scripts/train/finetun
     --checkpointing_steps 100 \
     --seed 42 \
     --gradient_checkpointing \
-    --data_json_path YOUR_DATA_JSON_PATH \
+    --data_json_path ${DATA_JSON_PATH} \
     --train_batch_size 1 \
     --num_latent_t 21 \
     --sp_size 8 \

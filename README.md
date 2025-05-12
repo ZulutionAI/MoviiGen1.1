@@ -1,6 +1,7 @@
-
 # MoviiGen 1.1
 
+[![HuggingFace](https://img.shields.io/badge/🤗%20Hugging%20Face-Model-blue)](https://huggingface.co/ZuluVision/MoviiGen1.1)
+[![GitHub stars](https://img.shields.io/github/stars/ZulutionAI/MoviiGen1.1?style=social)](https://github.com/ZulutionAI/MoviiGen1.1/stargazers)
 
 
 [**MoviiGen 1.1: Towards Cinematic-Quality Video Generative Models**]("https://huggingface.co/ZuluVision/MoviiGen1.1") <be>
@@ -17,12 +18,11 @@ This repository features our latest model, which establishes new benchmarks in c
 
 ## Video Demos
 
-| <video width="320" controls><source src="assets/79_1920*1056_seed3732225395.mp4" type="video/mp4">Your browser does not support the video tag.</video> | <video width="320" controls><source src="assets/150_1920*1056_seed1674457713.mp4" type="video/mp4">Your browser does not support the video tag.</video> | <video width="320" controls><source src="assets/143_1920*1056_seed3114534932.mp4" type="video/mp4">Your browser does not support the video tag.</video> | <video width="320" controls><source src="assets/94_1920*1056_seed3693446494.mp4" type="video/mp4">Your browser does not support the video tag.</video> |
+| <video width="320" controls><source src="https://huggingface.co/ZuluVision/MoviiGen1.1/resolve/main/assets/79_1920*1056_seed3732225395.mp4" type="video/mp4">Your browser does not support the video tag.</video> | <video width="320" controls><source src="https://huggingface.co/ZuluVision/MoviiGen1.1/resolve/main/assets/150_1920*1056_seed1674457713.mp4" type="video/mp4">Your browser does not support the video tag.</video> | <video width="320" controls><source src="https://huggingface.co/ZuluVision/MoviiGen1.1/resolve/main/assets/143_1920*1056_seed3114534932.mp4" type="video/mp4">Your browser does not support the video tag.</video> | <video width="320" controls><source src="https://huggingface.co/ZuluVision/MoviiGen1.1/resolve/main/assets/94_1920*1056_seed3693446494.mp4" type="video/mp4">Your browser does not support the video tag.</video> |
 |--------|--------|--------|--------|
-| <video width="320" controls><source src="assets/23_1920*1056_seed3934691816.mp4" type="video/mp4">Your browser does not support the video tag.</video> | <video width="320" controls><source src="assets/13_1920*1056..mp4" type="video/mp4">Your browser does not support the video tag.</video> | <video width="320" controls><source src="assets/26_1920*1056..mp4" type="video/mp4">Your browser does not support the video tag.</video> | <video width="320" controls><source src="assets/39_1920*1056..mp4" type="video/mp4">Your browser does not support the video tag.</video> |
-|--------|--------|--------|--------|
-| <video width="320" controls><source src="assets/100_1920*1056_seed2949593166.mp4" type="video/mp4">Your browser does not support the video tag.</video> | <video width="320" controls><source src="assets/54_1920*1056..mp4" type="video/mp4">Your browser does not support the video tag.</video> | <video width="320" controls><source src="assets/107_1920*1056_seed525896597.mp4" type="video/mp4">Your browser does not support the video tag.</video> | <video width="320" controls><source src="assets/94_1920*1056_seed3693446494.mp4" type="video/mp4">Your browser does not support the video tag.</video> |
-|--------|--------|--------|--------|
+| <video width="320" controls><source src="https://huggingface.co/ZuluVision/MoviiGen1.1/resolve/main/assets/23_1920*1056_seed3934691816.mp4" type="video/mp4">Your browser does not support the video tag.</video> | <video width="320" controls><source src="https://huggingface.co/ZuluVision/MoviiGen1.1/resolve/main/assets/13_1920*1056..mp4" type="video/mp4">Your browser does not support the video tag.</video> | <video width="320" controls><source src="https://huggingface.co/ZuluVision/MoviiGen1.1/resolve/main/assets/26_1920*1056..mp4" type="video/mp4">Your browser does not support the video tag.</video> | <video width="320" controls><source src="https://huggingface.co/ZuluVision/MoviiGen1.1/resolve/main/assets/39_1920*1056..mp4" type="video/mp4">Your browser does not support the video tag.</video> |
+| <video width="320" controls><source src="https://huggingface.co/ZuluVision/MoviiGen1.1/resolve/main/assets/100_1920*1056_seed2949593166.mp4" type="video/mp4">Your browser does not support the video tag.</video> | <video width="320" controls><source src="https://huggingface.co/ZuluVision/MoviiGen1.1/resolve/main/assets/54_1920*1056..mp4" type="video/mp4">Your browser does not support the video tag.</video> | <video width="320" controls><source src="https://huggingface.co/ZuluVision/MoviiGen1.1/resolve/main/assets/107_1920*1056_seed525896597.mp4" type="video/mp4">Your browser does not support the video tag.</video> | <video width="320" controls><source src="https://huggingface.co/ZuluVision/MoviiGen1.1/resolve/main/assets/163_1920*1056_seed3696194034.mp4" type="video/mp4">Your browser does not support the video tag.</video> |
+
 
 ## 🔥 Latest News!!
 
@@ -45,41 +45,14 @@ pip install -r requirements.txt
 
 #### Model Download
 
-T2V-14B  Model: 🤗 [Huggingface](https://huggingface.co/ZuluVision/MoviiGen1.1)          | Supports both 720P and 1080P
-
+T2V-14B  Model: 🤗 [Huggingface](https://huggingface.co/ZuluVision/MoviiGen1.1) 
+MoviiGen1.1 model supports both 720P and 1080P.
 
 Download models using huggingface-cli:
 ```
 pip install "huggingface_hub[cli]"
 huggingface-cli download ZuluVision/MoviiGen1.1 --local-dir ./MoviiGen1.1
 ```
-
-#### Run Text-to-Video Generation
-
-This repository supports two Text-to-Video models (14B) and two resolutions (720P and 1080P). The parameters and configurations for these models are as follows:
-
-<table>
-    <thead>
-        <tr>
-            <th rowspan="2">Task</th>
-            <th colspan="2">Resolution</th>
-            <th rowspan="2">Model</th>
-        </tr>
-        <tr>
-            <th>720P</th>
-            <th>1080P</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>t2v-14B</td>
-            <td style="color: green;">✔️</td>
-            <td style="color: green;">✔️</td>
-            <td>Wan2.1-T2V-14B</td>
-        </tr>
-    </tbody>
-</table>
-
 
 ## 🛠️ Training
 
@@ -103,12 +76,53 @@ We cache the videos and corresponding text prompts as latents and text embedding
 cd scripts/data_preprocess
 bash scripts/data_preprocess/preprocess.sh
 ```
+Example Data Format:
 
-Example
+training_data.json
+```json
+[
+    {
+        "cap": "your prompt",
+        "path": "path/to/your/video.mp4",
+        "resolution": {
+            "width": 3840,
+            "height": 2160
+        },
+        "fps": 23.976023976023978,
+        "duration": 1.4180833333333331
+    },
+    ...
+]
+```
+merge.txt:
+```txt
+relative_path_to_json_dir, training_data.json
+```
 
-### Training
+Output Json:
 
+video_caption.json
+```json
+[
+    {
+        "latent_path": "path/to/your/latent.pt",
+        "prompt_embed_path": "path/to/your/prompt_embed.pt",
+        "length": 12
+    },
+    ...
+]
+```
 
+### Train
+```bash
+bash scripts/train/finetune.sh
+```
+
+**When multi-node training, you need to set the number of nodes and the number of processes per node manually.** We provide a sample script for multi-node training.
+
+```bash
+bash scripts/bash/finetune_multi_node.sh
+```
 
 
 ## Manual Evaluation
@@ -117,11 +131,3 @@ Example
     <div style="flex: 1; margin-right: 10px;"><img src="assets/movie_asethetic.png" alt="Movie Aesthetic Evaluation" style="width: 100%;" /></div>
     <div style="flex: 1;"><img src="assets/visual_quality.png" alt="Movie Aesthetic Evaluation" style="width: 100%;" /></div>
 </div>
-
-
-
-## Community Contributions
-- [DiffSynth-Studio](https://github.com/modelscope/DiffSynth-Studio) provides more support for Wan, including video-to-video, FP8 quantization, VRAM optimization, LoRA training, and more. Please refer to [their examples](https://github.com/modelscope/DiffSynth-Studio/tree/main/examples/wanvideo).
-
-
-
