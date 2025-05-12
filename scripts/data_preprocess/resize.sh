@@ -1,0 +1,1 @@
+python scripts/data_preprocess/resize_videos.py --input_dir /vepfs-zulution/zhangpengpeng/cv/video_generation/Wan2.1/data/mixkit_src --output_dir /vepfs-zulution/zhangpengpeng/cv/video_generation/Wan2.1/data/mixkit/resized_480_new --max_workers 64
