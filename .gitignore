@@ -1,11 +1,6 @@
 .*
 *.py[cod]
-# *.jpg
-*.jpeg
-# *.png
-*.gif
 *.bmp
-*.mp4
 *.mov
 *.mkv
 *.log
@@ -29,11 +24,6 @@ samples/
 !requirements.txt
 .DS_Store
 *DS_Store
-google/
-Wan2.1-T2V-14B/
-Wan2.1-T2V-1.3B/
-Wan2.1-I2V-14B-480P/
-Wan2.1-I2V-14B-720P/
 cache_dir/
 data/
 output/
