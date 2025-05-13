@@ -38,11 +38,12 @@ git clone https://github.com/ZulutionAI/MoviiGen1.1.git
 cd MoviiGen1.1
 ```
 
-Install dependencies:
+1. Install dependencies:
 ```
 # Ensure torch >= 2.4.0
 pip install -r requirements.txt
 ```
+2. Install [FastVideo](https://github.com/hao-ai-lab/FastVideo) according to their instructions.
 
 #### Model Download
 
