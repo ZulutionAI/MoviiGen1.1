@@ -766,7 +766,7 @@ if __name__ == "__main__":
     )
 
     # Text encoder & model parameters
-    parser.add_argument("--text_encoder_name", type=str, default="/cv/models/umt5-xxl")
+    parser.add_argument("--text_encoder_name", type=str, default="google/umt5-xxl")
     parser.add_argument("--cache_dir", type=str, default="./cache_dir")
 
     args = parser.parse_args()

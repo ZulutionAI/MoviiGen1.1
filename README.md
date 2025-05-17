@@ -26,8 +26,8 @@ This repository features our latest model, which establishes new benchmarks in c
 
 
 ## 🔥 Latest News!!
-
-* May 12, 2025: 👋 We've released the inference code and **training code** and weights of MoviiGen1.1.
+* May 17, 2025: 👋 We've released the inference code and **training code** and weights of MoviiGen1.1.
+* May 12, 2025: 👋 We've released weights of MoviiGen1.1.
 
 ## 💡 Quickstart
 
@@ -48,12 +48,27 @@ pip install -r requirements.txt
 #### Model Download
 
 T2V-14B  Model: 🤗 [Huggingface](https://huggingface.co/ZuluVision/MoviiGen1.1) 
-MoviiGen1.1 model supports both 720P and 1080P.
+MoviiGen1.1 model supports both 720P and 1080P. For more cinematic quality, we recommend using 1080P and a 21:9 aspect ratio (1920*832).
 
 Download models using huggingface-cli:
 ```
 pip install "huggingface_hub[cli]"
 huggingface-cli download ZuluVision/MoviiGen1.1 --local-dir ./MoviiGen1.1
+```
+## 🎥 Inference
+
+Inference without prompt extend:
+
+```bash
+PYTHONPATH=. python scripts/inference/generate.py --ckpt_dir ./MoviiGen1.1 --prompt "Inside a smoky, atmospheric private eye office bathed in dramatic film noir lighting, sharp shadows from slatted blinds cut across a cluttered desk and worn surroundings, evoking the classic style by 1940s film. A world-weary detective is sitting behind the desk. He is smoking a cigarette, slowly bringing it to his lips, inhaling, and exhaling a plume of smoke that drifts in the harsh, directional light. The scene is rendered in stark black and white, creating a high-contrast, cinematic mood. The camera holds a static medium shot focused on the detective, emphasizing the gritty texture and oppressive atmosphere."
+```
+
+Inference with prompt extend:
+
+We provide a prompt extend model for MoviiGen1.1, which is a fine-tuned Qwen2.5-7B-Instruct model with our internal data.
+
+```bash
+PYTHONPATH=. python scripts/inference/generate.py --ckpt_dir ./MoviiGen1.1 --prompt "A beautiful woman in a red dress is walking on the street." --use_prompt_extend --prompt_extend_model ZuluVision/MoviiGen1.1_Prompt_Rewriter
 ```
 
 ## 🛠️ Training
@@ -72,13 +87,17 @@ Our training framework is built on [FastVideo](https://github.com/hao-ai-lab/Fas
 
 ### Data Preprocessing
 
-We cache the videos and corresponding text prompts as latents and text embeddings to optimize the training process. This preprocessing step significantly improves training efficiency by reducing computational overhead during the training phase.
+We cache the videos and corresponding text prompts as latents and text embeddings to optimize the training process. This preprocessing step significantly improves training efficiency by reducing computational overhead during the training phase. You need to provide a **merge.txt** file to specify the dataset path. And the dataset should be a json like **training_data.json**. Finally, you will get **video_caption.json** which contains the latents and text embeddings paths. 
 
 ```bash
-cd scripts/data_preprocess
 bash scripts/data_preprocess/preprocess.sh
 ```
 Example Data Format:
+
+merge.txt:
+```txt
+relative_path_to_json_dir, training_data.json
+```
 
 training_data.json
 ```json
@@ -95,10 +114,6 @@ training_data.json
     },
     ...
 ]
-```
-merge.txt:
-```txt
-relative_path_to_json_dir, training_data.json
 ```
 
 Output Json:
@@ -123,7 +138,7 @@ bash scripts/train/finetune.sh
 **When multi-node training, you need to set the number of nodes and the number of processes per node manually.** We provide a sample script for multi-node training.
 
 ```bash
-bash scripts/bash/finetune_multi_node.sh
+bash scripts/train/finetune_multi_node.sh
 ```
 
 

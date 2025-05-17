@@ -10,7 +10,7 @@ from contextlib import contextmanager
 from functools import partial
 
 import torch
-import torch.amp as amp
+import torch.cuda.amp as amp
 import torch.distributed as dist
 from tqdm import tqdm
 
@@ -18,8 +18,11 @@ from .distributed.fsdp import shard_model
 from .modules.model import WanModel
 from .modules.t5 import T5EncoderModel
 from .modules.vae import WanVAE
-from .utils.fm_solvers import (FlowDPMSolverMultistepScheduler,
-                               get_sampling_sigmas, retrieve_timesteps)
+from .utils.fm_solvers import (
+    FlowDPMSolverMultistepScheduler,
+    get_sampling_sigmas,
+    retrieve_timesteps,
+)
 from .utils.fm_solvers_unipc import FlowUniPCMultistepScheduler
 
 
@@ -84,55 +87,13 @@ class WanT2V:
         self.model = WanModel.from_pretrained(checkpoint_dir)
         self.model.eval().requires_grad_(False)
 
-        from safetensors import safe_open
-
-        def load_weights(weight_path, device="cpu"):
-            state_dict = {}
-            with safe_open(weight_path, framework="pt", device=device) as f:
-                for key in f.keys():
-                    state_dict[key] = f.get_tensor(key)
-            return state_dict
-
-        LOAD_WEIGHT = True
-        CFG_DISTILL = False
-        self.cfg_distill = CFG_DISTILL
-        self.load_weight = LOAD_WEIGHT
-        assert (not CFG_DISTILL) or (LOAD_WEIGHT and CFG_DISTILL)
-
-        if LOAD_WEIGHT:
-            if CFG_DISTILL:
-                weight_path = "/vepfs-zulution/zhangpengpeng/cv/video_generation/Wan2.1/data/outputs/exp9_type0/checkpoint-50/diffusion_pytorch_model.safetensors"
-            else:
-                weight_path = "/vepfs-zulution/zhangpengpeng/cv/video_generation/Wan2.1/data/outputs/exp9_type0/checkpoint-200/diffusion_pytorch_model.safetensors"
-            if weight_path and not CFG_DISTILL:
-                state_dict = load_weights(weight_path)
-                result = self.model.load_state_dict(state_dict, strict=True)
-                if rank <= 0:
-                    print("Missing keys:", result.missing_keys)
-                    print("Unexpected keys:", result.unexpected_keys)
-                    print(f"STEP: load distill model success {weight_path}")
-                del state_dict
-            else:
-                from fastvideo.models.wan.modules.model_cfg import WanModelCFG
-                state_dict = load_weights(weight_path)
-                model_config = dict(self.model.config)
-                model_config["guidance_embed"] = True
-                transformer = WanModelCFG(**model_config)
-                result = transformer.load_state_dict(state_dict, strict=False)
-                del self.model
-                self.model = transformer
-                if rank <= 0:
-                    print("Missing keys:", result.missing_keys)
-                    print("Unexpected keys:", result.unexpected_keys)
-                    print(f"CFG: load distill model success {weight_path}")
-                del state_dict
-
         if use_usp:
-            from xfuser.core.distributed import \
-                get_sequence_parallel_world_size
+            from xfuser.core.distributed import get_sequence_parallel_world_size
 
-            from .distributed.xdit_context_parallel import (usp_attn_forward,
-                                                            usp_dit_forward)
+            from .distributed.xdit_context_parallel import (
+                usp_attn_forward,
+                usp_dit_forward,
+            )
             for block in self.model.blocks:
                 block.self_attn.forward = types.MethodType(
                     usp_attn_forward, block.self_attn)
@@ -240,10 +201,8 @@ class WanT2V:
         no_sync = getattr(self.model, 'no_sync', noop_no_sync)
 
         # evaluation mode
-        with amp.autocast("cuda", dtype=self.param_dtype), torch.no_grad(), no_sync():
+        with amp.autocast(dtype=self.param_dtype), torch.no_grad(), no_sync():
 
-            if self.load_weight:
-                sample_solver = "euler"
             if sample_solver == 'unipc':
                 sample_scheduler = FlowUniPCMultistepScheduler(
                     num_train_timesteps=self.num_train_timesteps,
@@ -262,42 +221,11 @@ class WanT2V:
                     sample_scheduler,
                     device=self.device,
                     sigmas=sampling_sigmas)
-            elif sample_solver == 'euler':
-                from fastvideo.models.hunyuan.diffusion.schedulers import FlowMatchDiscreteScheduler
-                sample_scheduler = FlowMatchDiscreteScheduler(
-                    shift=shift,
-                    reverse=True,
-                    solver="euler",
-                )
-                sample_scheduler.set_timesteps(sampling_steps, device=self.device)
-                timesteps = sample_scheduler.timesteps
-                # print(f"using euler solver")
             else:
                 raise NotImplementedError("Unsupported solver.")
 
             # sample videos
             latents = noise
-
-            video = imageio.get_reader('./6s_cry1.mp4')
-            frames = []
-            for frame in video:
-                frames.append(torch.Tensor(frame) / 127.5 - 1)
-                print(frame.shape)
-            frames.append(frames[-1])
-            frames = torch.stack(frames, dim=0)
-            frames = frames.permute(3, 0, 1, 2)
-            frames.unsqueeze(0)
-            print(frames.shape)  # B C T H W
-            frames = frames.to(encoder_device)
-            # print(frame)
-
-            latents = vae.encode([frames])
-            print(latents[0].shape)
-
-            noise = torch.randn_like(latents[0])
-            noisy_model_input = 0.1 * noise + 0.9 * latents[0]
-            print(noisy_model_input.shape)
-            latents = noisy_model_input
 
             arg_c = {'context': context, 'seq_len': seq_len}
             arg_null = {'context': context_null, 'seq_len': seq_len}
@@ -309,26 +237,20 @@ class WanT2V:
                 timestep = torch.stack(timestep)
 
                 self.model.to(self.device)
-                if not self.cfg_distill:
-                    noise_pred_cond = self.model(
-                        latent_model_input, t=timestep, **arg_c)[0]
-                    noise_pred_uncond = self.model(
-                        latent_model_input, t=timestep, **arg_null)[0]
+                noise_pred_cond = self.model(
+                    latent_model_input, t=timestep, **arg_c)[0]
+                noise_pred_uncond = self.model(
+                    latent_model_input, t=timestep, **arg_null)[0]
 
-                    noise_pred = noise_pred_uncond + guide_scale * (
-                        noise_pred_cond - noise_pred_uncond)
-                else:
-                    guidance_tensor = torch.tensor([guide_scale*1000],
-                                                   device=latent_model_input[0].device,
-                                                   dtype=torch.bfloat16)
-                    noise_pred = self.model(latent_model_input, t=timestep, context=context,
-                                            seq_len=seq_len, guidance=guidance_tensor)[0]
+                noise_pred = noise_pred_uncond + guide_scale * (
+                    noise_pred_cond - noise_pred_uncond)
 
                 temp_x0 = sample_scheduler.step(
                     noise_pred.unsqueeze(0),
                     t,
                     latents[0].unsqueeze(0),
-                    return_dict=False)[0]
+                    return_dict=False,
+                    generator=seed_g)[0]
                 latents = [temp_x0.squeeze(0)]
 
             x0 = latents

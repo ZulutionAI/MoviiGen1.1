@@ -316,6 +316,7 @@ class T2V_dataset(Dataset):
         ]
 
         # Filter settings
+        self.drop_third_bin = getattr(args, 'drop_third_bin', False)
         self.drop_bins = getattr(args, 'drop_bins', [])
         self.drop_short_ratio = args.drop_short_ratio
 
@@ -471,26 +472,8 @@ class T2V_dataset(Dataset):
         """
         video_path = self.cap_list[idx]["path"]
 
-        # Try alternative paths for the video
-        clip_roots = [
-            '/movii-data-gen/share/cutscene_not_border/',
-            '/movii-data-gen/share/cutscene_rm_border/',
-            '/cv/share/cutscene_not_border/',
-            '/cv/share/cutscene_rm_border/',
-            '/movii-data-gen/share/cutscene/',
-            '/cv/share/cutscene/'
-        ]
-
-        original_path = video_path
-        for clip_root in clip_roots:
-            video_root = '/'.join(video_path.split('/')[:4]) + '/'
-            video_path_new = video_path.replace(video_root, clip_root)
-            if os.path.exists(video_path_new):
-                video_path = video_path_new
-                break
-
         if not os.path.exists(video_path):
-            raise FileNotFoundError(f"Video file not found: {original_path}, tried alternatives including {video_path}")
+            raise FileNotFoundError(f"Video file not found: {video_path}")
 
         frame_indices = self.cap_list[idx]["sample_frame_index"]
 

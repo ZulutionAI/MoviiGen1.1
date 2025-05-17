@@ -1,11 +1,10 @@
 import os
 
 import torch
-from fastvideo.models.wan.modules.t5 import T5EncoderModel
+from wan.modules.t5 import T5EncoderModel
 from safetensors import safe_open
 from torch.nn import functional as F
 
-# from fastvideo.models.wan.modules.model import WanModel
 from scripts.train.model.model_seq import WanModel
 
 
@@ -21,7 +20,7 @@ def load_wan(config, checkpoint_dir, device_id, rank, weight_path=None):
     return transformers
 
 
-def save_null_pt(model_path="/vepfs-zulution/models/Wan2.1-T2V-14B"):
+def save_null_pt(model_path="ZuluVision/MoviiGen1.1"):
     LEN = 512
     text_encoder = T5EncoderModel(
         text_len=LEN,
@@ -40,7 +39,7 @@ def save_null_pt(model_path="/vepfs-zulution/models/Wan2.1-T2V-14B"):
         value=0
     )
     print(null_encoded.shape)
-    torch.save(null_encoded, "/vepfs-zulution/zhangpengpeng/cv/video_generation/Wan2.1/data/mixkit/meta/null.pt")
+    torch.save(null_encoded, "data/null.pt")
 
 def load_weights(weight_path, device="cpu"):
     state_dict = {}

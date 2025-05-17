@@ -33,9 +33,8 @@ def copy_csvs_preserve_structure(src_dir, dst_dir):
         print(f"已复制: {csv_file} -> {target_file}")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="复制CSV文件并保持目录结构")
-    parser.add_argument("--src_dir", help="源目录路径",default="/vepfs-zulution/zhangpengpeng/cv/video_generation/Wan2.1/data/mixkit_src")
-    parser.add_argument("--dst_dir", help="目标目录路径",default="/vepfs-zulution/zhangpengpeng/cv/video_generation/Wan2.1/data/mixkit/resized_480")
+    parser = argparse.ArgumentParser(description="Copy CSV files and preserve directory structure")
+    parser.add_argument("--src_dir", help="Source directory path",default=None)
+    parser.add_argument("--dst_dir", help="Destination directory path",default=None)
     args = parser.parse_args()
     copy_csvs_preserve_structure(args.src_dir, args.dst_dir)
-    print("文件复制完成！")

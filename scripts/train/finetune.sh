@@ -2,16 +2,16 @@
  
 export PYTHONPATH=./:${PYTHONPATH}
 OUTPUT_DIR=YOUR_OUTPUT_DIR
-DATA_JSON_PATH=YOUR_DATA_JSON_PATH
+DATA_JSON_PATH=YOUR_DATA_JSON_PATH # video_caption.json from data_preprocess
 torchrun --nnodes 1 --nproc_per_node 8 --master-port 29500 scripts/train/finetune.py \
-    --max_seq_len 75600 \
+    --max_seq_len 170100 \
     --master_weight_type bf16 \
-    --ckpt_dir ZulutionAI/MoviiGen1.1 \
+    --ckpt_dir ./MoviiGen1.1 \
     --output_dir ${OUTPUT_DIR} \
     --checkpointing_steps 100 \
     --seed 42 \
     --gradient_checkpointing \
-    --data_json_path YOUR_DATA_JSON_PATH \
+    --data_json_path ${DATA_JSON_PATH} \
     --train_batch_size 1 \
     --num_latent_t 21 \
     --sp_size 8 \
@@ -23,7 +23,7 @@ torchrun --nnodes 1 --nproc_per_node 8 --master-port 29500 scripts/train/finetun
     --mixed_precision bf16 \
     --checkpoints_total_limit 3 \
     --allow_tf32 \
-    --num_height 720 \
+    --num_height 1080 \
     --num_width 1280 \
     --group_frame \
     --group_resolution \

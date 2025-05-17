@@ -15,7 +15,7 @@ class LatentDataset(Dataset):
         num_latent_t,
         cfg_rate,
         txt_max_len=512,  # For WanX
-        prompt_type="prompt_cap_base_path",
+        prompt_type="prompt_embed_path",
         seed=42,
         resolution_mix=None,
         resolution_mix_p=0.2,
@@ -66,9 +66,6 @@ class LatentDataset(Dataset):
 
     def __getitem__(self, idx):
         latent_file = self.data_anno[idx]["latent_path"]
-
-        # prompt_cap_base_path: Glass.2019.2160p.4K.BluRay.x265.10bit.AAC5.1-[YTS.MX]_001059_6611.530_6613.223.pt,
-        # prompt_cap_extended_path: "Glass.2019.2160p.4K.BluRay.x265.10bit.AAC5.1-[YTS.MX]_001059_6611.530_6613.223.pt",
         try:
             prompt_embed_file = self.data_anno[idx][self.prompt_type]
             prompt_embed_dir = self.prompt_embed_dir
@@ -187,7 +184,6 @@ def latent_collate_function(batch):
 
 if __name__ == "__main__":
     dataset = LatentDataset("data/moviidb_v0.1/preprocess/720p/videos2caption.json", num_latent_t=21, cfg_rate=0.0)
-    # dataset = LatentDataset("/vepfs-zulution/zhangpengpeng/cv/video_generation/Wan2.1/data/mixkit/processed/videos2caption.json", num_latent_t=21, cfg_rate=0.0)
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=False, collate_fn=latent_collate_function)
     for latent, prompt_embed, latent_attn_mask, prompt_attention_mask in dataloader:
         print(

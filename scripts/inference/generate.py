@@ -18,24 +18,15 @@ from PIL import Image
 import wan
 from wan.configs import (MAX_AREA_CONFIGS, SIZE_CONFIGS, SUPPORTED_SIZES,
                          WAN_CONFIGS)
-from wan.utils.prompt_extend import DashScopePromptExpander, QwenPromptExpander
+from wan.utils.prompt_extend import QwenPromptExpander
 from wan.utils.utils import cache_image, cache_video, str2bool
 
 EXAMPLE_PROMPT = {
-    "t2v-1.3B": {
-        "prompt": "Two anthropomorphic cats in comfy boxing gear and bright gloves fight intensely on a spotlighted stage.",
-    },
     "t2v-14B": {
-        "prompt": "Two anthropomorphic cats in comfy boxing gear and bright gloves fight intensely on a spotlighted stage.",
+        "prompt": "Inside a smoky, atmospheric private eye office bathed in dramatic film noir lighting, sharp shadows from slatted blinds cut across a cluttered desk and worn surroundings, evoking the classic style by 1940s film. A world-weary detective is sitting behind the desk. He is smoking a cigarette, slowly bringing it to his lips, inhaling, and exhaling a plume of smoke that drifts in the harsh, directional light. The scene is rendered in stark black and white, creating a high-contrast, cinematic mood. The camera holds a static medium shot focused on the detective, emphasizing the gritty texture and oppressive atmosphere.",
     },
     "t2i-14B": {
-        "prompt": "一个朴素端庄的美人",
-    },
-    "i2v-14B": {
-        "prompt":
-            "Summer beach vacation style, a white cat wearing sunglasses sits on a surfboard. The fluffy-furred feline gazes directly at the camera with a relaxed expression. Blurred beach scenery forms the background featuring crystal-clear waters, distant green hills, and a blue sky dotted with white clouds. The cat assumes a naturally relaxed posture, as if savoring the sea breeze and warm sunlight. A close-up shot highlights the feline's intricate details and the refreshing atmosphere of the seaside.",
-        "image":
-            "examples/i2v_input.JPG",
+        "prompt": "In a vast, cold landscape, set against the breathtaking backdrop of majestic snow-capped mountains and a serene distant lake, a fashionable woman stands still. She is elegantly dressed in an elegant winter coat and wears a thick scarf wrapped warmly around her neck. Her gaze is fixed forward as countless snowflakes gently drift and fall from the sky before her eyes, each individual flake catching the harsh light and sparkling brilliantly against the muted tones of the environment. Her expression is contemplative, reflecting a deep sense of thought and introspection amidst the solitude. The breathtaking surroundings behind her, showcasing the immense scale and beauty of the scene, are framed with a wide-angle lens to emphasize the vastness and grandeur of the landscape. The camera starts with a steady eye-level medium shot capturing both the woman and the expansive landscape together. It then performs a slow, smooth zooming movement, gradually pushing closer to highlight the woman's contemplative expression, eventually reaching a tight close-up focused solely on her face as the snowflakes continue to drift around her. The high-contrast lighting of the scene enhances the visual drama, creating stark sharp shadows and brilliant bright highlights across the contours of the woman, the subject, her clothing, and the texture of the snowy environment. All visual elements are rendered with high detail and a focus on mood, presented in a cinematic style that effectively draws attention to both the solitary woman and her stunning, breathtaking surroundings.",
     },
 }
 
@@ -48,12 +39,10 @@ def _validate_args(args):
 
     # The default sampling steps are 40 for image-to-video tasks and 50 for text-to-video tasks.
     if args.sample_steps is None:
-        args.sample_steps = 40 if "i2v" in args.task else 50
+        args.sample_steps = 50
 
     if args.sample_shift is None:
         args.sample_shift = 5.0
-        if "i2v" in args.task and args.size in ["832*480", "480*832"]:
-            args.sample_shift = 3.0
 
     # The default number of frames are 1 for text-to-image tasks and 81 for other tasks.
     if args.frame_num is None:
@@ -133,7 +122,7 @@ def _parse_args():
     parser.add_argument(
         "--save_file",
         type=str,
-        required=True,
+        default=None,
         help="The file to save the generated image or video to.")
     parser.add_argument(
         "--prompt",
@@ -146,32 +135,20 @@ def _parse_args():
         default=False,
         help="Whether to use prompt extend.")
     parser.add_argument(
-        "--prompt_extend_method",
-        type=str,
-        default="local_qwen",
-        choices=["dashscope", "local_qwen"],
-        help="The prompt extend method to use.")
-    parser.add_argument(
         "--prompt_extend_model",
         type=str,
-        default=None,
+        default='ZuluVision/MoviiGen1.1_Prompt_Rewriter',
         help="The prompt extend model to use.")
     parser.add_argument(
         "--prompt_extend_target_lang",
         type=str,
-        default="ch",
-        choices=["ch", "en"],
+        default="en",
         help="The target language of prompt extend.")
     parser.add_argument(
         "--base_seed",
         type=int,
         default=-1,
         help="The seed to use for generating the image or video.")
-    parser.add_argument(
-        "--image",
-        type=str,
-        default=None,
-        help="The image to generate the video from.")
     parser.add_argument(
         "--sample_solver",
         type=str,
@@ -190,19 +167,6 @@ def _parse_args():
         type=float,
         default=5.0,
         help="Classifier free guidance scale.")
-    parser.add_argument(
-        "--step_distill",
-        action="store_true",
-        help="Whether to use step distillation.")
-    parser.add_argument(
-        "--cfg_distill",
-        action="store_true",
-        help="Whether to use cfg distillation.")
-    parser.add_argument(
-        "--weight_path",
-        type=str,
-        default=None,
-        help="The path to the weight file.")
 
     args = parser.parse_args()
 
@@ -251,8 +215,10 @@ def generate(args):
 
     if args.ulysses_size > 1 or args.ring_size > 1:
         assert args.ulysses_size * args.ring_size == world_size, f"The number of ulysses_size and ring_size should be equal to the world size."
-        from xfuser.core.distributed import (init_distributed_environment,
-                                             initialize_model_parallel)
+        from xfuser.core.distributed import (
+            init_distributed_environment,
+            initialize_model_parallel,
+        )
         init_distributed_environment(
             rank=dist.get_rank(), world_size=dist.get_world_size())
 
@@ -263,21 +229,14 @@ def generate(args):
         )
 
     if args.use_prompt_extend:
-        if args.prompt_extend_method == "dashscope":
-            prompt_expander = DashScopePromptExpander(
-                model_name=args.prompt_extend_model, is_vl="i2v" in args.task)
-        elif args.prompt_extend_method == "local_qwen":
-            prompt_expander = QwenPromptExpander(
-                model_name=args.prompt_extend_model,
-                is_vl="i2v" in args.task,
-                device=rank)
-        else:
-            raise NotImplementedError(
-                f"Unsupport prompt_extend_method: {args.prompt_extend_method}")
+        prompt_expander = QwenPromptExpander(
+            model_name=args.prompt_extend_model,
+            is_vl=False,
+            device=rank)
 
     cfg = WAN_CONFIGS[args.task]
     if args.ulysses_size > 1:
-        assert cfg.num_heads % args.ulysses_size == 0, f"`num_heads` must be divisible by `ulysses_size`."
+        assert cfg.num_heads % args.ulysses_size == 0, f"`{cfg.num_heads=}` cannot be divided evenly by `{args.ulysses_size=}`."
 
     logging.info(f"Generation job args: {args}")
     logging.info(f"Generation model config: {cfg}")
@@ -323,22 +282,13 @@ def generate(args):
             dit_fsdp=args.dit_fsdp,
             use_usp=(args.ulysses_size > 1 or args.ring_size > 1),
             t5_cpu=args.t5_cpu,
-            weight_path=args.weight_path,
-            STEP_DISTILL=args.step_distill,
-            CFG_DISTILL=args.cfg_distill,
         )
 
         logging.info(
             f"Generating {'image' if 't2i' in args.task else 'video'} ...")
-
-        logging.info(
-            f"Generating {'image' if 't2i' in args.task else 'video'} ...")
-
-        prompt_part = args.prompt[:10].replace(' ', '_')
         video = wan_t2v.generate(
             args.prompt,
             size=SIZE_CONFIGS[args.size],
-            # size=size,
             frame_num=args.frame_num,
             shift=args.sample_shift,
             sample_solver=args.sample_solver,
@@ -347,127 +297,31 @@ def generate(args):
             seed=args.base_seed,
             offload_model=args.offload_model)
 
-        if rank == 0:
+    if rank == 0:
+        if args.save_file is None:
             formatted_time = datetime.now().strftime("%Y%m%d_%H%M%S")
-            formatted_prompt = args.prompt.replace(" ", "_").replace("/","_")[:50]
+            formatted_prompt = args.prompt.replace(" ", "_").replace("/",
+                                                                     "_")[:50]
             suffix = '.png' if "t2i" in args.task else '.mp4'
+            args.save_file = f"{args.task}_{args.size.replace('*','x') if sys.platform=='win32' else args.size}_{args.ulysses_size}_{args.ring_size}_{formatted_prompt}_{formatted_time}" + suffix
 
-            if "t2i" in args.task:
-                logging.info(f"Saving generated image to {args.save_file}")
-                cache_image(
-                    tensor=video.squeeze(1)[None],
-                    save_file=args.save_file,
-                    nrow=1,
-                    normalize=True,
-                    value_range=(-1, 1))
-            else:
-                logging.info(f"Saving generated video to {args.save_file}")
-                cache_video(
-                    tensor=video[None],
-                    save_file=args.save_file,
-                    fps=cfg.sample_fps,
-                    nrow=1,
-                    normalize=True,
-                    value_range=(-1, 1))
-
-    else:
-        if args.prompt is None:
-            args.prompt = EXAMPLE_PROMPT[args.task]["prompt"]
-        if args.image is None:
-            args.image = EXAMPLE_PROMPT[args.task]["image"]
-        logging.info(f"Input prompt: {args.prompt}")
-        logging.info(f"Input image: {args.image}")
-
-        img = Image.open(args.image).convert("RGB")
-        if args.use_prompt_extend:
-            logging.info("Extending prompt ...")
-            if rank == 0:
-                prompt_output = prompt_expander(
-                    args.prompt,
-                    tar_lang=args.prompt_extend_target_lang,
-                    image=img,
-                    seed=args.base_seed)
-                if prompt_output.status == False:
-                    logging.info(
-                        f"Extending prompt failed: {prompt_output.message}")
-                    logging.info("Falling back to original prompt.")
-                    input_prompt = args.prompt
-                else:
-                    input_prompt = prompt_output.prompt
-                input_prompt = [input_prompt]
-            else:
-                input_prompt = [None]
-            if dist.is_initialized():
-                dist.broadcast_object_list(input_prompt, src=0)
-            args.prompt = input_prompt[0]
-            logging.info(f"Extended prompt: {args.prompt}")
-
-        transfromer_dir = ""
-        transfromer_dir = "/cv/zhangpengpeng/cv/video_generation/Wan2.1/data/outputs/exp15_distill_cfg_i2v/checkpoint-500/"
-        logging.info("Creating WanI2V pipeline.")
-        wan_i2v = wan.WanI2V(
-            config=cfg,
-            checkpoint_dir=args.ckpt_dir,
-            device_id=device,
-            rank=rank,
-            t5_fsdp=args.t5_fsdp,
-            dit_fsdp=args.dit_fsdp,
-            use_usp=(args.ulysses_size > 1 or args.ring_size > 1),
-            t5_cpu=args.t5_cpu,
-            transfromer_dir=transfromer_dir,
-        )
-
-        logging.info("Generating video ...")
-        args.sample_steps = 30
-        
-        # args.size, size_name = "480*832", "480p"
-        args.size, size_name = "1280*720", "720p"
-        parent_dir = f"/cv/zhangpengpeng/cv/video_generation/Wan2.1/outputs/exp15_i2v_cfg/500_{size_name}_prompts"
-        prompts_dir = "/cv/zhangpengpeng/cv/video_generation/Wan2.1/examples/i2v/"
-        with open(prompts_dir+"all.txt", "r") as f:
-            lines = f.readlines()
-        for prompt, image_dir in [line.strip().split(" ! ") for line in lines]:
-            logging.info(f"prompt: {prompt}, image: {image_dir}")
-            img = Image.open(prompts_dir+image_dir).convert("RGB")
-            args.prompt = prompt
-            for guidance in [5]:
-                for shift in [3]:
-                    args.sample_shift = shift
-                    args.sample_guide_scale = guidance
-                    video = wan_i2v.generate(
-                        args.prompt,
-                        img,
-                        max_area=MAX_AREA_CONFIGS[args.size],
-                        frame_num=args.frame_num,
-                        shift=args.sample_shift,
-                        sample_solver=args.sample_solver,
-                        sampling_steps=args.sample_steps,
-                        guide_scale=args.sample_guide_scale,
-                        seed=args.base_seed,
-                        offload_model=args.offload_model)
-                    
-                    if rank == 0:
-                        Path(parent_dir).mkdir(parents=True, exist_ok=True)
-                        # args.save_file = str(parent_dir) + f"/step{args.sample_steps}_shift{shift}_guide{args.sample_guide_scale}" + suffix
-                        args.save_file = str(parent_dir) + f"/{args.prompt[:7]}_step{args.sample_steps}_shift{args.sample_shift}_guide{args.sample_guide_scale}.mp4"
-
-                        if args.save_file is None:
-                            formatted_time = datetime.now().strftime("%Y%m%d_%H%M%S")
-                            formatted_prompt = args.prompt.replace(" ", "_").replace("/",
-                                                                                    "_")[:50]
-                            suffix = '.png' if "t2i" in args.task else '.mp4'
-                            args.save_file = f"{args.task}_{args.size.replace('*','x') if sys.platform=='win32' else args.size}_{args.ulysses_size}_{args.ring_size}_{formatted_prompt}_{formatted_time}" + suffix
-
-                        logging.info(f"Saving generated video to {args.save_file}")
-                        cache_video(
-                            tensor=video[None],
-                            save_file=args.save_file,
-                            fps=cfg.sample_fps,
-                            nrow=1,
-                            normalize=True,
-                            value_range=(-1, 1))
-
-
+        if "t2i" in args.task:
+            logging.info(f"Saving generated image to {args.save_file}")
+            cache_image(
+                tensor=video.squeeze(1)[None],
+                save_file=args.save_file,
+                nrow=1,
+                normalize=True,
+                value_range=(-1, 1))
+        else:
+            logging.info(f"Saving generated video to {args.save_file}")
+            cache_video(
+                tensor=video[None],
+                save_file=args.save_file,
+                fps=cfg.sample_fps,
+                nrow=1,
+                normalize=True,
+                value_range=(-1, 1))
     logging.info("Finished.")
 
 

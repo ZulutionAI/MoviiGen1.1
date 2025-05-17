@@ -2,7 +2,7 @@ from torchvision import transforms
 from torchvision.transforms import Lambda
 from transformers import AutoTokenizer
 
-from scripts.dataset.t2v_datasets_v2 import T2V_dataset
+from scripts.dataset.t2v_datasets import T2V_dataset
 from scripts.dataset.transform import (CenterCropResizeVideo, Normalize255,
                                        TemporalRandomCrop)
 

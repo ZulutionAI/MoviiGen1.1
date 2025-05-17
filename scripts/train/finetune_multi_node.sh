@@ -12,7 +12,7 @@ torchrun \
     scripts/train/finetune.py \
     --max_seq_len 75600 \
     --master_weight_type bf16 \
-    --ckpt_dir ZulutionAI/MoviiGen1.1 \
+    --ckpt_dir ./MoviiGen1.1 \
     --output_dir ${OUTPUT_DIR} \
     --checkpointing_steps 100 \
     --seed 42 \

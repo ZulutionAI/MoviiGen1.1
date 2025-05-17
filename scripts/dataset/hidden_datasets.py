@@ -90,20 +90,3 @@ def latent_collate_function(batch):
     ys = torch.stack(ys, dim=0)
     clip_features = torch.stack(clip_features, dim=0)
     return latents, prompt_embeds, latent_attn_mask, prompt_attention_masks, ys, clip_features
-
-
-if __name__ == "__main__":
-    dataset = LatentDataset("/cv/zhangpengpeng/cv/video_generation/Wan2.1/data/processed/mixkit/merge_480/videos2caption.json")
-    dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=False, collate_fn=latent_collate_function)
-    for latent, prompt_embed, latent_attn_mask, prompt_attention_mask, ys, clip_features in dataloader:
-        print(
-            latent.shape,
-            prompt_embed.shape,
-            latent_attn_mask.shape,
-            prompt_attention_mask.shape,
-            ys.shape,
-            clip_features.shape,
-        )
-        import pdb
-
-        pdb.set_trace()

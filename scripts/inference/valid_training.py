@@ -19,7 +19,7 @@ from tqdm import tqdm
 import wan
 from wan.configs import (MAX_AREA_CONFIGS, SIZE_CONFIGS, SUPPORTED_SIZES,
                          WAN_CONFIGS)
-from wan.utils.prompt_extend import DashScopePromptExpander, QwenPromptExpander
+from wan.utils.prompt_extend import QwenPromptExpander
 from wan.utils.utils import cache_image, cache_video, str2bool
 
 warnings.filterwarnings('ignore')
@@ -290,7 +290,6 @@ def generate(args):
 
     while True:
 
-        # 找到output_dir下的最大checkpoint文件夹
         max_iter = current_iter
         max_checkpoint_path = None
 
