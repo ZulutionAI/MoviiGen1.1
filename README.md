@@ -26,7 +26,7 @@ This repository features our latest model, which establishes new benchmarks in c
 
 
 ## 🔥 Latest News!!
-* May 17, 2025: 👋 We've released the inference code and **training code** and weights of MoviiGen1.1.
+* May 17, 2025: 👋 We've released the inference code and **training code** of MoviiGen1.1.
 * May 12, 2025: 👋 We've released weights of MoviiGen1.1.
 
 ## 💡 Quickstart
