@@ -65,10 +65,26 @@ PYTHONPATH=. python scripts/inference/generate.py --ckpt_dir ./MoviiGen1.1 --pro
 
 Inference with prompt extend:
 
-We provide a prompt extend model for MoviiGen1.1, which is a fine-tuned Qwen2.5-7B-Instruct model with our internal data.
+We provide a prompt extend model for MoviiGen1.1, which is a fine-tuned Qwen2.5-7B-Instruct model with our internal data. Model is available on 🤗 [Huggingface](https://huggingface.co/ZuluVision/MoviiGen1.1_Prompt_Rewriter).
 
 ```bash
 PYTHONPATH=. python scripts/inference/generate.py --ckpt_dir ./MoviiGen1.1 --prompt "A beautiful woman in a red dress is walking on the street." --use_prompt_extend --prompt_extend_model ZuluVision/MoviiGen1.1_Prompt_Rewriter
+```
+
+Prompt Tips:
+
+- **Prompt Length**: The prompt length should be around 100~200.
+- **Prompt Content**: The prompt should contain **scene description**, **main subject**, **events**, **aesthetics description** and **camera movement**.
+- **Example**: 
+```
+Scene Description: A smoky, atmospheric private eye office bathed in dramatic film noir lighting, sharp shadows from slatted blinds cut across a cluttered desk and worn surroundings, evoking the classic style by 1940s film.
+Main Subject: A world-weary detective is sitting behind the desk.
+Events: He is smoking a cigarette, slowly bringing it to his lips, inhaling, and exhaling a plume of smoke that drifts in the harsh, directional light.
+Aesthetics Description: The scene is rendered in stark black and white, creating a high-contrast, cinematic mood.
+Camera Movement: The camera holds a static medium shot focused on the detective, emphasizing the gritty texture and oppressive atmosphere.
+
+Final Prompt:
+A smoky, atmospheric private eye office bathed in dramatic film noir lighting, sharp shadows from slatted blinds cut across a cluttered desk and worn surroundings, evoking the classic style by 1940s film. A world-weary detective is sitting behind the desk. He is smoking a cigarette, slowly bringing it to his lips, inhaling, and exhaling a plume of smoke that drifts in the harsh, directional light. The scene is rendered in stark black and white, creating a high-contrast, cinematic mood. The camera holds a static medium shot focused on the detective, emphasizing the gritty texture and oppressive atmosphere.
 ```
 
 ## 🛠️ Training
