@@ -110,12 +110,12 @@ bash scripts/data_preprocess/preprocess.sh
 ```
 Example Data Format:
 
-merge.txt:
+**merge.txt**
 ```txt
 relative_path_to_json_dir, training_data.json
 ```
 
-training_data.json
+**training_data.json**
 ```json
 [
     {
@@ -134,7 +134,7 @@ training_data.json
 
 Output Json:
 
-video_caption.json
+**video_caption.json**
 ```json
 [
     {
