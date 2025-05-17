@@ -10,7 +10,7 @@ torchrun \
     --master_addr $MLP_WORKER_0_HOST \
     --master_port $MLP_WORKER_0_PORT \
     scripts/train/finetune.py \
-    --max_seq_len 75600 \
+    --max_seq_len 170100 \
     --master_weight_type bf16 \
     --ckpt_dir ./MoviiGen1.1 \
     --output_dir ${OUTPUT_DIR} \
@@ -29,8 +29,8 @@ torchrun \
     --mixed_precision bf16 \
     --checkpoints_total_limit 3 \
     --allow_tf32 \
-    --num_height 720 \
-    --num_width 1280 \
+    --num_height 1080 \
+    --num_width 1920 \
     --group_frame \
     --group_resolution \
     --group_ar

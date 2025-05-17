@@ -24,7 +24,7 @@ torchrun --nnodes 1 --nproc_per_node 8 --master-port 29500 scripts/train/finetun
     --checkpoints_total_limit 3 \
     --allow_tf32 \
     --num_height 1080 \
-    --num_width 1280 \
+    --num_width 1920 \
     --group_frame \
     --group_resolution \
     --group_ar
