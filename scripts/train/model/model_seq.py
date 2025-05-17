@@ -7,7 +7,7 @@ import torch.distributed as dist
 import torch.nn as nn
 from diffusers.configuration_utils import ConfigMixin, register_to_config
 from diffusers.models.modeling_utils import ModelMixin
-from fastvideo.models.wan.modules.attention import flash_attention
+from wan.modules.attention import flash_attention
 from fastvideo.utils.communications import all_gather, all_to_all_4D
 from fastvideo.utils.parallel_states import (get_sequence_parallel_state,
                                              nccl_info)
