@@ -156,11 +156,3 @@ bash scripts/train/finetune.sh
 ```bash
 bash scripts/train/finetune_multi_node.sh
 ```
-
-
-## Manual Evaluation
-
-<div style="display: flex; justify-content: space-between;">
-    <div style="flex: 1; margin-right: 10px;"><img src="assets/movie_asethetic.png" alt="Movie Aesthetic Evaluation" style="width: 100%;" /></div>
-    <div style="flex: 1;"><img src="assets/visual_quality.png" alt="Movie Aesthetic Evaluation" style="width: 100%;" /></div>
-</div>
