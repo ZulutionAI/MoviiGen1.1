@@ -163,7 +163,7 @@ If you find our work helpful, please cite us.
 ```
 @misc{moviigen2025,
   title        = {MoviiGen 1.1: Towards Cinematic-Quality Video Generative Models},
-  author       = {Yunhao Shui, Benjin Zhu, Xuekuan Wang, Feng Qiu, Yuqiu Huang, Haoyu Zheng, Haoyu Yin, Pengpeng Zhang, Jinru Han, Zhuo Zeng, Yaxin Ding, Helen Xi, Xiang Chen, Jinzhu Li, Liangxian Feng, Xincheng Yin, Bin Wu, Keqiang Sun},
+  author       = {Yunhao Shui, Benjin Zhu, Xuekuan Wang, Feng Qiu, Yuqiu Huang, Haoyu Zheng, Haoyu Yin, Pengpeng Zhang, Jinru Han, Zhuo Zeng, Yaxin Ding, Helen Xi, Xiang Chen, Jinzhu Li, Liangxian Feng, Xincheng Yin, Bing Wu, Keqiang Sun},
   year         = {2025},
   url          = {https://github.com/ZulutionAI/MoviiGen1.1}
 }
